@@ -11,9 +11,9 @@ class Database:
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
-    def execute_query(self, query_str):
+    def execute_query(self, query_str, kwargs=None):
         try:
-            self.cursor.execute(query_str)
+            self.cursor.execute(query_str, kwargs)
             return self.cursor.fetchall()
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
