@@ -15,7 +15,7 @@ def index():
 @app.route('/ping/', methods=['GET'])
 def ping():
     try:
-        r = requests.get(Conf.API_GATEWAY_HEALTH_ENDPOINT)
+        r = requests.get(Conf.PORT)
         return jsonify(r.json())
     except ConnectionError as e:
         return "Error"
