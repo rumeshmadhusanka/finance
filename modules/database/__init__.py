@@ -7,14 +7,24 @@ class Database:
     def __init__(self):
         try:
             self.connection = psycopg2.connect(Config.DATABASE_URL)
-            self.cursor = self.connection.cursor()
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
     def execute_query(self, query_str, kwargs=None):
         try:
-            self.cursor.execute(query_str, kwargs)
-            return self.cursor.fetchall()
+            cursor = self.connection.cursor()
+            cursor.execute(query_str, kwargs)
+            return cursor.fetchall()
+        except (Exception, psycopg2.Error) as error:
+            print("Error while connecting to PostgreSQL", error)
+
+    def execute_update(self, query_str, kwargs=None):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query_str, kwargs)
+            self.connection.commit()
+            cursor.close()
+            return
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
 

@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
+
 import pandas as pd
 import yfinance as yf
-from datetime import datetime, timedelta
 
 
 # def get_daily_data(company_code):
@@ -14,11 +15,21 @@ from datetime import datetime, timedelta
 #         "volume": info["volume"]
 #     }
 #     return ret
+def get_company_info(company_code):
+    ticker = yf.Ticker(company_code)
+    info = ticker.info
+    ret = {
+        "sector": info["sector"],
+        "address": info["address1"],
+        "symbol": info["symbol"],
+        "short_name": info["shortName"]
+    }
+    return ret
 
 
 def get_daily_data(company_code):
     ticker = yf.Ticker(company_code)
-    df = ticker.history(period="3d")
+    df = ticker.history(period="100d")
     df = df.reset_index()
     df.Date = pd.to_datetime(df.Date)
     # 'Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits'
@@ -59,10 +70,14 @@ def get_recommendations(company_code, start_date=(datetime.now() - timedelta(day
 
 
 if __name__ == '__main__':
-    comp = "GOOG"
+    comp = "NFLX"
 
     # hist = get_daily_data(comp)
     # print(hist)
+    # ticker = yf.Ticker(comp)
+    # info = ticker.info
+    # print(info)
+    # recom = get_recommendations(comp)
+    # print(recom.to_string())
 
-    recom = get_recommendations(comp)
-    print(recom.to_string())
+    get_company_info(comp)
