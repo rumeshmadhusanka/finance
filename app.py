@@ -1,3 +1,4 @@
+import json
 from threading import Thread
 
 from flask import Flask, jsonify
@@ -31,6 +32,18 @@ def info(company_code):
         return Response({"message": "Error " + str(e)}, status=502, mimetype='application/json')
 
 
+@app.route('/recommendations/<company_code>/<start_date>/<end_date>', methods=['GET'])
+def recommend(company_code, start_date, end_date):
+    try:
+        company = Company(company_code)
+        inf = company.get_recommendations(start_date, end_date)
+        ret = json.dumps(inf, indent=4, sort_keys=True, default=str)
+        return ret
+    except Exception as e:
+        print(e)
+        return Response({"message": "Error " + str(e)}, status=502, mimetype='application/json')
+
+
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({"message": "Default Route"})
@@ -43,7 +56,7 @@ def back():
 
 
 t = Thread(target=back)
-# t.start()
+t.start()
 
 if __name__ == '__main__':
     app.run(port=app.config['PORT'], debug=True)

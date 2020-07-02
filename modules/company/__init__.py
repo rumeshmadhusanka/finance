@@ -48,7 +48,7 @@ class Company:
                 "from public.recommendations " \
                 "where company = %(company_code)s and timestamp_of_date between %(" \
                 "start_date)s and %(end_date)s group by(company, date)"
-        return database.execute_query(query, {"company_code": self.company_code,
+        return database.execute_query_get_dict(query, {"company_code": self.company_code,
                                               "start_date": start_date,
                                               "end_date": end_date})
 
