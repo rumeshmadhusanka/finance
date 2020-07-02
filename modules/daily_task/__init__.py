@@ -16,14 +16,16 @@ class DailyTask:
         try:
             for comp in self.companies:
                 c = Company(comp)
+                c.set_company_info()
                 c.set_recommendations()
+                c.set_daily_data()
         except Exception as e:
             print("Error in Task", e)
 
     def start(self):
         try:
             scheduler = BackgroundScheduler()
-            scheduler.add_job(func=self.task, trigger="interval", seconds=5)
+            scheduler.add_job(func=self.task, trigger="interval", days=1)
             scheduler.start()
             # Shut down the scheduler when exiting the app
             atexit.register(lambda: scheduler.shutdown())
