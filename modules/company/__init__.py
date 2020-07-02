@@ -44,15 +44,18 @@ class Company:
                                 )
 
     def get_recommendations(self, start_date, end_date):
-        query = "select * from public.recommendations where company = %(company_code)s and date between %(" \
-                "start_date)s and %(end_date)s "
+        query = "select DATE(timestamp_of_date) as date, round(avg(scalar)::numeric,1) as recommendation " \
+                "from public.recommendations " \
+                "where company = %(company_code)s and timestamp_of_date between %(" \
+                "start_date)s and %(end_date)s group by(company, date)"
         return database.execute_query(query, {"company_code": self.company_code,
                                               "start_date": start_date,
                                               "end_date": end_date})
 
     def set_recommendations(self):
-        query = "insert into public.recommendations(company, date, scalar) VALUES (%(company)s,%(date)s,%(scalar)s) " \
-                "on conflict (company,date) do update set company= %(company)s,date= %(date)s,scalar= %(scalar)s"
+        query = "insert into public.recommendations(company, timestamp_of_date, scalar) VALUES (%(company)s,%(date)s," \
+                "%(scalar)s) on conflict (company,timestamp_of_date) do update set company= %(company)s," \
+                "timestamp_of_date= %(date)s,scalar= %(scalar)s"
         data = get_recommendations(self.company_code)
         for each in data:
             database.execute_update(query, {
@@ -65,8 +68,8 @@ class Company:
 if __name__ == '__main__':
     d = Company("FB")
     # print(d.get_company_info())
-    # print(d.get_recommendations("2020-01-20", '2020-07-01'))
-    d.set_recommendations()
+    print(d.get_recommendations("2020-01-20", '2020-07-01'))
+    # d.set_recommendations()
     # print(d.get_daily_data("2020-01-20", '2020-07-01'))
     # d.set_daily_data()
     # print(d.get_daily_data("2020-01-20", '2020-07-01'))
