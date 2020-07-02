@@ -1,5 +1,5 @@
 from modules.database import Database
-from modules.yfinance_impl import get_daily_data, get_company_info
+from modules.yfinance_impl import get_daily_data, get_company_info, get_recommendations
 
 database = Database()
 
@@ -30,8 +30,8 @@ class Company:
                                             })
 
     def get_company_info(self):
-        query = "select sector,address,symbol,short_name from public.company"
-        return database.execute_query(query)
+        query = "select sector,address,symbol,short_name from public.company where company=%(company_code)s"
+        return database.execute_query(query, {"company_code": self.company_code})
 
     def set_company_info(self):
         query = "insert into public.company(code,sector, address, symbol, short_name) values (%(code)s,%(sector)s," \
@@ -44,16 +44,29 @@ class Company:
                                 )
 
     def get_recommendations(self, start_date, end_date):
-        query = "select * from public.recommendations where date between %(start_date)s and %(end_date)s"
-        return database.execute_query(query, {"start_date": start_date, "end_date": end_date})
-
+        query = "select * from public.recommendations where company = %(company_code)s and date between %(" \
+                "start_date)s and %(end_date)s "
+        return database.execute_query(query, {"company_code": self.company_code,
+                                              "start_date": start_date,
+                                              "end_date": end_date})
 
     def set_recommendations(self):
-        pass
+        query = "insert into public.recommendations(company, date, scalar) VALUES (%(company)s,%(date)s,%(scalar)s) " \
+                "on conflict (company,date) do update set company= %(company)s,date= %(date)s,scalar= %(scalar)s"
+        data = get_recommendations(self.company_code)
+        for each in data:
+            database.execute_update(query, {
+                "company": self.company_code,
+                "date": each[0],
+                "scalar": each[5]
+            })
 
 
 if __name__ == '__main__':
-    d = Company("AAPL")
+    d = Company("FB")
+    # print(d.get_company_info())
+    # print(d.get_recommendations("2020-01-20", '2020-07-01'))
+    d.set_recommendations()
     # print(d.get_daily_data("2020-01-20", '2020-07-01'))
     # d.set_daily_data()
     # print(d.get_daily_data("2020-01-20", '2020-07-01'))

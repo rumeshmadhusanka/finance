@@ -14,8 +14,10 @@ class Config(object):
 
     PORT = environ.get("PORT")
     DATABASE_URL = environ.get("DATABASE_URL")
+    COMPANIES = environ.get("COMPANIES").split(",")
 
 
 if __name__ == "__main__":
     p = Config()
     print(p.PORT)
+    print(p.COMPANIES)

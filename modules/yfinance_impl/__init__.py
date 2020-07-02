@@ -58,15 +58,19 @@ def set_recommend_value(grade):
         return 0
 
 
-def get_recommendations(company_code, start_date=(datetime.now() - timedelta(days=200)), end_date=datetime.now()):
+def get_recommendations(company_code):
     ticker = yf.Ticker(company_code)
     df = ticker.recommendations
-    mask = (df.index > start_date) & (df.index <= end_date)
-    df = df.loc[mask]
+    # mask = (df.index > start_date) & (df.index <= end_date)
+    # df = df.loc[mask]
     df = df.reset_index()
     df.Date = pd.to_datetime(df.Date)
-    df['recommend'] = list(map(set_recommend_value, df['To Grade']))
-    return df
+    df['scalar'] = list(map(set_recommend_value, df['To Grade']))
+    ret = []
+    for index, row in df.iterrows():
+        ret.append(row.values.tolist())
+    return ret
+
 
 
 if __name__ == '__main__':
@@ -77,7 +81,9 @@ if __name__ == '__main__':
     # ticker = yf.Ticker(comp)
     # info = ticker.info
     # print(info)
-    # recom = get_recommendations(comp)
-    # print(recom.to_string())
+    recom = get_recommendations(comp)
+    print(recom)
 
-    get_company_info(comp)
+    # ticker = yf.Ticker(comp)
+    # df = ticker.recommendations
+    # print(df.to_string())

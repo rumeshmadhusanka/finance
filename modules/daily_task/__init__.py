@@ -10,7 +10,7 @@ class DailyTask:
 
     # get data from api and save todo
     def task(self):
-        pass
+        print("Task is running")
 
     def start(self):
         scheduler = BackgroundScheduler()
@@ -18,3 +18,9 @@ class DailyTask:
         scheduler.start()
         # Shut down the scheduler when exiting the app
         atexit.register(lambda: scheduler.shutdown())
+
+
+if __name__ == '__main__':
+    d = DailyTask()
+    d.start()
+    input()
